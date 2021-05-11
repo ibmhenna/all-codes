@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script type="text/javascript">
+	function saveUser() {
+		
+			function success(response){
+				if(!response.ok){
+					alert('error happned');
+					return;
+				}
+				return response.json();
+			} 
+			
+		function handleErrors(response){
+			console.log(error);
+		}
+		console.log('2');
+		const userform = document.getElementById('userform');
+		
+		if(!userform.checkValidity()){
+			alert('form is invalid');
+			return;
+		}
+		const promise = fetch('/user', { //ajax request, Asynchronous javascript and xml
+			method : 'POST',
+			headers : {
+				'Content-Type' : 'application/json'
+			},
+			body : JSON.stringify({
+				name : document.getElementById('username').value,
+				mobile: document.getElementById('mobile').value,
+				email: document.getElementById('email').value,
+				dob: document.getElementById('dobid').value
+			})
+		});
+		promise.then(success);
+		promise.then(function(data){
+			console.log(data);
+		});
+		promise.catch(function(error){
+			console.log(error);
+		});
+		console.log('1');
+	}
+	
+	function getUsers(){
+		const promise = fetch('/user');
+		promise.then(function(response){
+			return response.json();
+		})
+		.then(function(users){
+			console.log(users);
+			const table = document.getElementById('users');
+			
+			//to remove the tr body which is there on table so that the repeated hitting on get users wont cretae more rows
+			const rows=table.children.length;
+			for(let count=0; count<rows; count++){
+				table.children[0].remove();
+			}
+				
+			for(let index=0; index< users.length;index++){
+				console.log(users[index]);
+				const currentUser = users[index];
+				const row = document.createElement('tr');
+				const nameColumn = document.createElement('td');
+				const mobileColumn = document.createElement('td');
+				const emailColumn = document.createElement('td');
+				const dobColumn = document.createElement('td');
+				
+				nameColumn.append(currentUser.name);
+				mobileColumn.append(currentUser.mobile);
+				emailColumn.append(currentUser.email);
+				dobColumn.append(currentUser.dob);
+				
+				row.appendChild(nameColumn);
+				row.appendChild(mobileColumn);
+				row.appendChild(emailColumn);
+				row.appendChild(dobColumn);
+				
+				table.appendChild(row);
+			}
+		})
+	}
+</script>
+</head>
+<body>
+	<h3>Userform</h3>
+	<form id='userform'>
+		<input id='username' placeholder="Name" value='Henna'> <input
+			type='tel' placeholder='Mobile Number' pattern="[0-9]{10}"
+			value='8492637592' required id='mobile'> <input type='email'
+			placeholder='Email' required id='email' value='henna@gmail.com'>
+		<input type='date' placeholder='DoB' required id='dobid'>
+	</form>
+	<button onclick="saveUser()">Save</button>
+	<button onclick="getUsers()">Get Users</button>
+	<table>
+		<thead>
+			<td>Name</td>
+			<td>Mobile</td>
+			<td>Email</td>
+			<td>DoB</td>
+		</thead>
+		<tbody id='users'></tbody>
+	</table>
+</body>
+</html>
